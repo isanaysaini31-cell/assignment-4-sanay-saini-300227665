@@ -1,0 +1,809 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Fraser Valley Early Warning Network</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout concept: a field report. Sticky index, one reading column, wide containers for tables, Gantt and flow chart. */
+:root{
+  --bg:#f3f6f6; --surface:#ffffff; --fg:#132226; --muted:#4a5e63; --line:#cddada;
+  --accent:#0a6e6a; --accent-soft:#dcefed; --signal:#a8480a; --signal-soft:#f8e6d6;
+  --c-init:#3f5fa8; --c-plan:#6d4fa3; --c-exec:#0a6e6a; --c-ctrl:#8a6c10; --c-close:#a8480a;
+  --font-display:"Space Grotesk","Helvetica Neue",Arial,sans-serif;
+  --font-body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1a1d; --surface:#142428; --fg:#e3eeee; --muted:#9fb5b8; --line:#2a3f43;
+    --accent:#4fc3bb; --accent-soft:#12383a; --signal:#f0a04b; --signal-soft:#3a2a17;
+    --c-init:#8aa4e6; --c-plan:#b79af0; --c-exec:#4fc3bb; --c-ctrl:#d9bd5c; --c-close:#e8946a;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1a1d; --surface:#142428; --fg:#e3eeee; --muted:#9fb5b8; --line:#2a3f43;
+  --accent:#4fc3bb; --accent-soft:#12383a; --signal:#f0a04b; --signal-soft:#3a2a17;
+  --c-init:#8aa4e6; --c-plan:#b79af0; --c-exec:#4fc3bb; --c-ctrl:#d9bd5c; --c-close:#e8946a;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:4.5rem}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.65;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+a{color:var(--accent)}
+.wrap{max-width:960px;margin:0 auto}
+header.top{padding-block:2.5rem 1.5rem;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(2rem,5vw,3.25rem);line-height:1.08;margin:.4rem 0 1rem;text-wrap:balance;letter-spacing:-.01em}
+.lede{font-size:1.15rem;max-width:none;color:var(--fg);text-align:justify;hyphens:auto}
+.meta{display:flex;flex-wrap:wrap;gap:.4rem 1.5rem;margin-top:1.25rem;font-size:.9rem;color:var(--muted)}
+.meta b{color:var(--fg);font-weight:600}
+nav.index{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--surface);border-bottom:1px solid var(--line);margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px))) 0;padding:0 max(16px,env(safe-area-inset-left,0px))}
+nav.index .wrap{display:flex;gap:1.1rem;overflow-x:auto;white-space:nowrap;padding-block:.65rem;font-size:.88rem;scrollbar-width:thin}
+nav.index a{text-decoration:none;color:var(--muted);font-weight:500}
+nav.index a:hover,nav.index a:focus-visible{color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section{padding-block:2.75rem 1rem;border-bottom:1px solid var(--line)}
+h2{font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2rem);line-height:1.2;margin:0 0 1rem;text-wrap:balance}
+h3{font-family:var(--font-display);font-size:1.25rem;line-height:1.3;margin:2.25rem 0 .6rem;text-wrap:balance}
+h4{font-family:var(--font-display);font-size:1rem;margin:1.25rem 0 .3rem}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:.7rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:.1rem .45rem;border-radius:3px;margin-right:.5rem;vertical-align:.15em}
+p,li{max-width:none}
+section p,section li{text-align:justify;text-justify:inter-word;hyphens:auto;-webkit-hyphens:auto}
+section .scroll p,section table p,.refs li,.chips li,nav li{text-align:left}
+ul,ol{padding-left:1.2rem}
+li{margin:.25rem 0}
+.cite{font-size:.86em;color:var(--muted);text-decoration:none;white-space:normal}
+.cite:hover{color:var(--accent);text-decoration:underline}
+.scroll{overflow-x:auto;margin:1rem 0;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:620px}
+th,td{padding:.6rem .8rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font-family:var(--font-mono);font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tfoot td{font-weight:600;background:var(--bg)}
+.note{border-left:3px solid var(--signal);background:var(--signal-soft);padding:.7rem 1rem;margin:1.25rem 0;max-width:none;font-size:.94rem;text-align:justify;border-radius:0 4px 4px 0}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:1rem 0;padding:0;list-style:none;max-width:none}
+.chips li{margin:0;max-width:none}
+.chips a{display:inline-block;font-size:.82rem;padding:.25rem .6rem;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--fg);background:var(--surface)}
+.chips a:hover{border-color:var(--accent);color:var(--accent)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1rem;margin:1rem 0}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:1rem 1.1rem;min-width:0}
+.box h4{margin-top:0}
+.box ul{margin:.3rem 0 0}
+dl.charter{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:0;margin:1rem 0;border:1px solid var(--line);border-radius:6px;background:var(--surface);max-width:none}
+dl.charter dt,dl.charter dd{margin:0;padding:.6rem .9rem;border-bottom:1px solid var(--line)}
+dl.charter dt{font-family:var(--font-mono);font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+dl.charter dt:last-of-type,dl.charter dd:last-of-type{border-bottom:0}
+@media (max-width:560px){dl.charter{grid-template-columns:1fr}dl.charter dt{border-bottom:0;padding-bottom:0}}
+/* Gantt */
+.gantt{min-width:900px;display:grid;grid-template-columns:230px repeat(13,minmax(44px,1fr));font-size:.82rem}
+.gantt>div{border-bottom:1px solid var(--line)}
+.gantt .gh{font-family:var(--font-mono);font-size:.68rem;color:var(--muted);text-align:center;padding:.35rem 0;background:var(--bg)}
+.gantt .gy{font-family:var(--font-mono);font-size:.72rem;font-weight:500;text-align:center;padding:.35rem 0;background:var(--bg);color:var(--fg);border-left:1px solid var(--line)}
+.gantt .gl{padding:.4rem .7rem;display:flex;align-items:center}
+.gantt .gc{border-left:1px solid var(--line);opacity:.5}
+.gantt .bar{height:14px;border-radius:3px;align-self:center;margin:0 1px}
+.gantt .ms{align-self:center;justify-self:center;width:13px;height:13px;background:var(--signal);transform:rotate(45deg);margin:0}
+.gantt .mslabel{font-size:.72rem;color:var(--muted);align-self:center;padding-left:.5rem;white-space:nowrap}
+.k-init{background:var(--c-init)}.k-plan{background:var(--c-plan)}.k-exec{background:var(--c-exec)}.k-ctrl{background:var(--c-ctrl)}.k-close{background:var(--c-close)}
+.legend{display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;font-size:.84rem;color:var(--muted);margin:.5rem 0}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:.4rem;vertical-align:-1px}
+.legend i.d{transform:rotate(45deg);width:10px;height:10px;border-radius:0;background:var(--signal)}
+svg.flow{display:block;min-width:1000px;width:100%;height:auto}
+svg.flow text{fill:var(--fg);font-family:var(--font-body);font-size:13px}
+svg.flow .bx{fill:var(--surface);stroke:var(--accent);stroke-width:1.5}
+svg.flow .bx.alert{fill:var(--signal-soft);stroke:var(--signal)}
+svg.flow .ln{stroke:var(--muted);stroke-width:1.5;fill:none}
+svg.flow .lb{font-family:var(--font-mono);font-size:11px;fill:var(--muted)}
+svg.flow .hd{font-family:var(--font-mono);font-size:10.5px;fill:var(--muted);letter-spacing:.06em}
+.matrix td.score{font-weight:600;text-align:center}
+.s-hi{background:var(--signal-soft)}
+.swot{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:1rem}
+.refs{padding-left:0;list-style:none}
+.refs li{padding-left:2rem;text-indent:-2rem;margin:.55rem 0;max-width:none;word-break:break-word;font-size:.94rem}
+footer{padding-block:2rem 4rem;color:var(--muted);font-size:.88rem}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+
+<div class="wrap">
+<header class="top" lang="en-CA">
+  <div class="eyebrow">Project proposal &middot; Visual charter &middot; Chaacha &amp; UFV</div>
+  <h1>Fraser Valley Early Warning Network</h1>
+  <p class="lede">A $1,000,000,000 plan to give the Fraser Valley a sewer-based early warning system, a University of the Fraser Valley pathogen laboratory, and a surge-ready response chain, with the project closed out by December 31, 2029.</p>
+  <div class="meta">
+    <span><b>Prepared by</b> [Your name], [Student number]</span>
+    <span><b>For</b> Kevin, Project Management course, UFV</span>
+    <span><b>Submitted</b> November 23, 2026</span>
+    <span><b>Funder</b> Government of Canada (course scenario)</span>
+  </div>
+</header>
+</div>
+
+<nav class="index" aria-label="Sections"><div class="wrap">
+  <a href="#why">Why</a><a href="#idea">Concept</a><a href="#time">1 Time</a><a href="#scope">2 Scope</a><a href="#cost">3 Cost</a><a href="#stakeholders">4 Stakeholders</a><a href="#spheres">5 Spheres</a><a href="#frames">6 Frames</a><a href="#champion">7 Champion</a><a href="#deliverables">8 Deliverables</a><a href="#lifecycle">9 Life cycle</a><a href="#processes">10 Processes</a><a href="#preinit">11 Pre-initiation</a><a href="#reports">12 Progress</a><a href="#swot">13 SWOT</a><a href="#roi">14 ROI</a><a href="#quality">15 Quality</a><a href="#charter">16 Charter</a><a href="#testing">17 Testing</a><a href="#hr">18 HR</a><a href="#motivation">19 Motivation</a><a href="#resources">20 Resources</a><a href="#comms">21 Communication</a><a href="#risks">22 Risks</a><a href="#procurement">23 Procurement</a><a href="#handling">24 Handling</a><a href="#closing">25 Closing</a><a href="#references">References</a>
+</div></nav>
+
+<main class="wrap" lang="en-CA"><section id="map" style="padding-top:1.75rem">
+  <h2>How this page maps to the assignment</h2>
+  <p>Each of the 25 required topics has its own heading below. Use the links to jump straight to one. Figures that come from a source carry an in-text citation that links to the reference list. Figures marked <em>team estimate</em> are my own planning assumptions, not sourced facts, and would be replaced by quotes during the planning phase.</p>
+  <ul class="chips">
+    <li><a href="#time">1 Time</a></li><li><a href="#scope">2 Scope</a></li><li><a href="#cost">3 Cost</a></li><li><a href="#stakeholders">4 Stakeholders</a></li><li><a href="#spheres">5 Three spheres</a></li><li><a href="#frames">6 Four frames</a></li><li><a href="#champion">7 Champion</a></li><li><a href="#deliverables">8 Deliverables</a></li><li><a href="#lifecycle">9 Life cycle</a></li><li><a href="#processes">10 Process groups</a></li><li><a href="#preinit">11 Pre-initiation</a></li><li><a href="#reports">12 Progress reports</a></li><li><a href="#swot">13 SWOT</a></li><li><a href="#roi">14 ROI and payback</a></li><li><a href="#quality">15 Quality</a></li><li><a href="#charter">16 Charter</a></li><li><a href="#testing">17 Testing, cost of quality</a></li><li><a href="#hr">18 HR</a></li><li><a href="#motivation">19 Motivation</a></li><li><a href="#resources">20 Resources</a></li><li><a href="#comms">21 Communication</a></li><li><a href="#risks">22 Risks</a></li><li><a href="#procurement">23 Procurement</a></li><li><a href="#handling">24 Handling stakeholders</a></li><li><a href="#closing">25 Closing</a></li>
+  </ul>
+</section>
+
+<section id="why">
+  <h2>Why this matters for the Fraser Valley before the next pandemic</h2>
+
+  <h3>The shutdown was costly, and it began with a warning that was never issued</h3>
+  <p>The first COVID-19 shutdown showed how costly a late warning can be. In March 2020 alone, Canada's real GDP fell 7.5% <a class="cite" href="#ref-statcan20">(Statistics Canada, 2020)</a>, and the full year was a 5.4% contraction, the largest annual drop since quarterly data were first recorded in 1961 <a class="cite" href="#ref-citynews">(CityNews 1130, 2021)</a>. The BC economy shrank 3.8% in 2020 <a class="cite" href="#ref-statcan21">(Statistics Canada, 2021)</a>. Economists at Queen's University calculated that the impact on Canada from March 2020 to February 2021 was over $170 billion, or about 8.3% of GDP <a class="cite" href="#ref-queens">(Cotton et al., 2020)</a>. Public spending followed: a CBC analysis found that Ottawa had paid out $240 billion in eight months, or about $952 million per day <a class="cite" href="#ref-cbc240">(CBC News, 2020)</a>.</p>
+  <p>The warning system was part of the problem. The Auditor General of Canada determined that the Public Health Agency of Canada was not as prepared as it could have been, and that its Global Public Health Intelligence Network did not issue an alert about the virus that became COVID-19 <a class="cite" href="#ref-oag">(Auditor General of Canada, 2021)</a>. The Auditor General also found that the agency's two main early warning tools did not work as intended <a class="cite" href="#ref-cbcag">(CBC News, 2021)</a>. As of September 2023, there had been at least 374,106 COVID-19 hospital admissions and 46,472 deaths in Canada <a class="cite" href="#ref-phac26">(Public Health Agency of Canada, 2026)</a>.</p>
+
+  <h3>The Fraser Valley felt it first-hand</h3>
+  <p>The region was a pressure point many times over. Fraser Health announced outbreaks at Chilliwack General Hospital, where transmission was detected on a medicine unit <a class="cite" href="#ref-fh2021">(Fraser Health, 2021)</a>, and a few days later at Abbotsford Regional Hospital, when the health authority described the region as a hot spot <a class="cite" href="#ref-globalch">(Global News, 2021)</a>. Omicron continued to affect care homes, such as Menno Hospital in Abbotsford and Eden Care Centre in Chilliwack <a class="cite" href="#ref-fh2022">(Fraser Health, 2022)</a>. A community outbreak also hit an Abbotsford poultry-processing plant in December 2020 <a class="cite" href="#ref-straight">(Georgia Straight, 2020)</a>.</p>
+  <p>There are many people at risk, and the number is growing. At the 2021 census, Abbotsford had a population of 153,875 and Chilliwack 98,161 <a class="cite" href="#ref-fvrd22">(Fraser Valley Regional District, 2022)</a>, and Abbotsford is projected to grow to approximately 192,000 by 2030 <a class="cite" href="#ref-fvrd25">(Fraser Valley Regional District, 2025)</a>. Of the 317,670 off-reserve residents of the regional district, 24,010 (7.6%) identify as Indigenous <a class="cite" href="#ref-fvrdind">(Fraser Valley Regional District, n.d.)</a>, so any plan must be created in partnership with Indigenous people, not just for them.</p>
+
+  <h3>The gap: the Valley's sewers are not even on the map</h3>
+  <p>The BC Centre for Disease Control (BCCDC) runs BC's wastewater program, which samples wastewater treatment plants two to three times per week and reports results for SARS-CoV-2, influenza and RSV on a public dashboard <a class="cite" href="#ref-bccdc">(BC Centre for Disease Control, n.d.)</a>. The Abbotsford-Mission (JAMES) and Chilliwack plants are not on the list of participating plants on that page <a class="cite" href="#ref-bccdc">(BC Centre for Disease Control, n.d.)</a>. The program covers about 64% of British Columbians, which leaves roughly a third of the population outside it <a class="cite" href="#ref-cwn">(Canadian Water Network, 2024)</a>. Part of the reason the BCCDC expanded to the North late was that it did not have the specialized equipment or trained staff it needed <a class="cite" href="#ref-zeidler">(Zeidler, 2023)</a>. In 2025, CBC reported that funding for the BC program had ended, and that the Ontario program had already been closed in July 2024 <a class="cite" href="#ref-kulkarni">(Kulkarni, 2025)</a>.</p>
+
+  <h3>The next threat could start in our own barns</h3>
+  <p>The Fraser Valley has already given off a pandemic-like warning sign. In 2004, two poultry workers in the Valley were infected with H7N3, and in November 2024 a teenager in B.C. was the first person in Canada to catch H5N1 domestically <a class="cite" href="#ref-cbcradio">(CBC Radio, 2024)</a>. An estimated 17 million birds were culled in the Abbotsford-Chilliwack area in 2004 <a class="cite" href="#ref-cbc22">(CBC News, 2022)</a>, and the Valley is home to approximately 80% of the province's poultry farms <a class="cite" href="#ref-ctv22">(CTV News, 2022)</a>. Since the current outbreak began in 2022, Abbotsford has had 100 commercial flocks hit by avian influenza <a class="cite" href="#ref-graber">(Graber, 2024)</a>, and Fraser Health's communicable disease team already monitors the employees of affected farms <a class="cite" href="#ref-fhhpai">(Fraser Health, n.d.)</a>. In a region with this much animal-human contact, an emerging virus needs to be identified in people as early as possible.</p>
+
+  <h3>Wastewater is the right core</h3>
+  <p>Wastewater monitoring provides lead time. In Saskatoon, reported new cases lagged the sewage viral load by about seven days <a class="cite" href="#ref-xie">(Xie et al., 2022)</a>. New SARS-CoV-2 lineages were detected between one and sixteen weeks before clinical testing in samples from Toronto Pearson airport <a class="cite" href="#ref-overton">(Overton et al., 2024)</a>. A pilot in a seniors' residence in Peterborough, Ontario used building-level sewage data to detect outbreaks earlier <a class="cite" href="#ref-phac23">(Public Health Agency of Canada, 2023)</a>, and a 2026 Ontario model assumed a gain of one to ten days of lead time when testing whether the approach is cost-effective <a class="cite" href="#ref-phac26">(Public Health Agency of Canada, 2026)</a>. In late 2021, when the BC testing system was stretched thin, the wastewater dashboard was one of the more reliable ways to monitor community virus levels <a class="cite" href="#ref-kulkarni">(Kulkarni, 2025)</a>.</p>
+  <p>It is also inexpensive per unit. Published cost studies in low- and middle-income countries ranged from $34 to $517 per sample <a class="cite" href="#ref-mathematica">(Mathematica, n.d.)</a>, or $0.07 to $0.13 per person per year in two catchments <a class="cite" href="#ref-path">(PATH, n.d.)</a>. A cost model of a United States military pilot found that wastewater monitoring complements other monitoring approaches and is highly cost-effective compared with them <a class="cite" href="#ref-sanjak">(Sanjak et al., 2024)</a>. One equipment vendor claims in-house testing costs about $40, against $200 to $600 or more at a third-party lab <a class="cite" href="#ref-hach">(Hach, n.d.)</a>; that is a marketing figure, so actual savings may be lower.</p>
+  <div class="note"><strong>How this translates to a $1 billion budget.</strong> Sampling is cheap, and spending a billion dollars on sampling alone would be wasteful. The money is only worth the cost if it also provides what was missing in 2020: the resources and training (a regional laboratory and trained personnel) to support a medical health officer who can respond to a warning within hours, and the materials and practice (supplies and drills) to act on it. That is how this project is designed.</div>
+</section>
+
+<section id="idea">
+  <h2>The concept: a network from sewer to response</h2>
+  <p>The Fraser Valley Early Warning Network (FVEWN) has four interconnected components. First, a sampling network of 25 sites: the JAMES plant that treats Abbotsford, Mission and Sumas, Washington <a class="cite" href="#ref-abby">(City of Abbotsford, n.d.)</a>, the Chilliwack plant on Wolfe Road <a class="cite" href="#ref-chwk">(City of Chilliwack, n.d.)</a>, the smaller plants at Agassiz and Hope <a class="cite" href="#ref-gnews23">(Global News, 2023)</a>, and facility-level sites such as long-term care homes, hospitals, UFV campuses, shelters, poultry-processing plants and Abbotsford airport. Second, the UFV Fraser Valley Pathogen Laboratory, which does local testing and sequences samples for variants. Third, a data and alert platform that converts results into a public dashboard and a private alert line to Fraser Health. Finally, a surge-readiness hub, which stores supplies and conducts drills so that a warning leads to action.</p>
+  <p>UFV is the natural home. It has campuses and locations in Abbotsford, Chilliwack, Mission and Hope <a class="cite" href="#ref-ufvcamp">(University of the Fraser Valley, n.d.-a)</a>, serves approximately 15,000 students per year <a class="cite" href="#ref-ufvabout">(University of the Fraser Valley, n.d.-b)</a>, and is legally mandated to serve the Fraser-Cascade, Chilliwack, Abbotsford and Mission school districts <a class="cite" href="#ref-ufvsem">(University of the Fraser Valley, 2022)</a>. The students who work in the lab also staff the response drills, and become the region's trained surge workforce.</p>
+
+  </section>
+
+<section id="time"><h2>1. Time</h2>
+  <p>The proposal is due November 23, 2026. The approved project runs from January 2027 to December 31, 2029, which is 36 months of delivery plus a pre-initiation quarter. The Gantt chart shows the thirteen quarters and the major work packages. Colour shows the process group, and diamonds show milestones.</p>
+  <div class="legend"><span><i class="k-init"></i>Initiating</span><span><i class="k-plan"></i>Planning</span><span><i class="k-exec"></i>Executing</span><span><i class="k-ctrl"></i>Monitoring and controlling</span><span><i class="k-close"></i>Closing</span><span><i class="d"></i>Milestone</span></div>
+<div class="scroll"><div class="gantt" role="table" aria-label="Gantt chart, Q4 2026 to Q4 2029">
+<div class="gh" style="grid-row:1">&nbsp;</div>
+<div class="gy" style="grid-row:1;grid-column:2/3">2026</div>
+<div class="gy" style="grid-row:1;grid-column:3/7">2027</div>
+<div class="gy" style="grid-row:1;grid-column:7/11">2028</div>
+<div class="gy" style="grid-row:1;grid-column:11/15">2029</div>
+<div class="gh" style="grid-row:2">Work package</div>
+<div class="gh" style="grid-row:2;grid-column:2">Q4</div>
+<div class="gh" style="grid-row:2;grid-column:3">Q1</div>
+<div class="gh" style="grid-row:2;grid-column:4">Q2</div>
+<div class="gh" style="grid-row:2;grid-column:5">Q3</div>
+<div class="gh" style="grid-row:2;grid-column:6">Q4</div>
+<div class="gh" style="grid-row:2;grid-column:7">Q1</div>
+<div class="gh" style="grid-row:2;grid-column:8">Q2</div>
+<div class="gh" style="grid-row:2;grid-column:9">Q3</div>
+<div class="gh" style="grid-row:2;grid-column:10">Q4</div>
+<div class="gh" style="grid-row:2;grid-column:11">Q1</div>
+<div class="gh" style="grid-row:2;grid-column:12">Q2</div>
+<div class="gh" style="grid-row:2;grid-column:13">Q3</div>
+<div class="gh" style="grid-row:2;grid-column:14">Q4</div>
+<div class="gl" style="grid-row:3;grid-column:1">Pre-initiation</div>
+<div class="gc" style="grid-row:3;grid-column:2"></div>
+<div class="gc" style="grid-row:3;grid-column:3"></div>
+<div class="gc" style="grid-row:3;grid-column:4"></div>
+<div class="gc" style="grid-row:3;grid-column:5"></div>
+<div class="gc" style="grid-row:3;grid-column:6"></div>
+<div class="gc" style="grid-row:3;grid-column:7"></div>
+<div class="gc" style="grid-row:3;grid-column:8"></div>
+<div class="gc" style="grid-row:3;grid-column:9"></div>
+<div class="gc" style="grid-row:3;grid-column:10"></div>
+<div class="gc" style="grid-row:3;grid-column:11"></div>
+<div class="gc" style="grid-row:3;grid-column:12"></div>
+<div class="gc" style="grid-row:3;grid-column:13"></div>
+<div class="gc" style="grid-row:3;grid-column:14"></div>
+<div class="bar k-init" style="grid-row:3;grid-column:2/3"></div>
+<div class="gl" style="grid-row:4;grid-column:1">Initiating: charter and governance</div>
+<div class="gc" style="grid-row:4;grid-column:2"></div>
+<div class="gc" style="grid-row:4;grid-column:3"></div>
+<div class="gc" style="grid-row:4;grid-column:4"></div>
+<div class="gc" style="grid-row:4;grid-column:5"></div>
+<div class="gc" style="grid-row:4;grid-column:6"></div>
+<div class="gc" style="grid-row:4;grid-column:7"></div>
+<div class="gc" style="grid-row:4;grid-column:8"></div>
+<div class="gc" style="grid-row:4;grid-column:9"></div>
+<div class="gc" style="grid-row:4;grid-column:10"></div>
+<div class="gc" style="grid-row:4;grid-column:11"></div>
+<div class="gc" style="grid-row:4;grid-column:12"></div>
+<div class="gc" style="grid-row:4;grid-column:13"></div>
+<div class="gc" style="grid-row:4;grid-column:14"></div>
+<div class="bar k-init" style="grid-row:4;grid-column:3/4"></div>
+<div class="gl" style="grid-row:5;grid-column:1">Planning: baselines and procurement packages</div>
+<div class="gc" style="grid-row:5;grid-column:2"></div>
+<div class="gc" style="grid-row:5;grid-column:3"></div>
+<div class="gc" style="grid-row:5;grid-column:4"></div>
+<div class="gc" style="grid-row:5;grid-column:5"></div>
+<div class="gc" style="grid-row:5;grid-column:6"></div>
+<div class="gc" style="grid-row:5;grid-column:7"></div>
+<div class="gc" style="grid-row:5;grid-column:8"></div>
+<div class="gc" style="grid-row:5;grid-column:9"></div>
+<div class="gc" style="grid-row:5;grid-column:10"></div>
+<div class="gc" style="grid-row:5;grid-column:11"></div>
+<div class="gc" style="grid-row:5;grid-column:12"></div>
+<div class="gc" style="grid-row:5;grid-column:13"></div>
+<div class="gc" style="grid-row:5;grid-column:14"></div>
+<div class="bar k-plan" style="grid-row:5;grid-column:3/5"></div>
+<div class="gl" style="grid-row:6;grid-column:1">Site agreements and sewershed mapping</div>
+<div class="gc" style="grid-row:6;grid-column:2"></div>
+<div class="gc" style="grid-row:6;grid-column:3"></div>
+<div class="gc" style="grid-row:6;grid-column:4"></div>
+<div class="gc" style="grid-row:6;grid-column:5"></div>
+<div class="gc" style="grid-row:6;grid-column:6"></div>
+<div class="gc" style="grid-row:6;grid-column:7"></div>
+<div class="gc" style="grid-row:6;grid-column:8"></div>
+<div class="gc" style="grid-row:6;grid-column:9"></div>
+<div class="gc" style="grid-row:6;grid-column:10"></div>
+<div class="gc" style="grid-row:6;grid-column:11"></div>
+<div class="gc" style="grid-row:6;grid-column:12"></div>
+<div class="gc" style="grid-row:6;grid-column:13"></div>
+<div class="gc" style="grid-row:6;grid-column:14"></div>
+<div class="bar k-exec" style="grid-row:6;grid-column:3/6"></div>
+<div class="gl" style="grid-row:7;grid-column:1">Laboratory design and construction</div>
+<div class="gc" style="grid-row:7;grid-column:2"></div>
+<div class="gc" style="grid-row:7;grid-column:3"></div>
+<div class="gc" style="grid-row:7;grid-column:4"></div>
+<div class="gc" style="grid-row:7;grid-column:5"></div>
+<div class="gc" style="grid-row:7;grid-column:6"></div>
+<div class="gc" style="grid-row:7;grid-column:7"></div>
+<div class="gc" style="grid-row:7;grid-column:8"></div>
+<div class="gc" style="grid-row:7;grid-column:9"></div>
+<div class="gc" style="grid-row:7;grid-column:10"></div>
+<div class="gc" style="grid-row:7;grid-column:11"></div>
+<div class="gc" style="grid-row:7;grid-column:12"></div>
+<div class="gc" style="grid-row:7;grid-column:13"></div>
+<div class="gc" style="grid-row:7;grid-column:14"></div>
+<div class="bar k-exec" style="grid-row:7;grid-column:4/9"></div>
+<div class="gl" style="grid-row:8;grid-column:1">Laboratory commissioning and accreditation</div>
+<div class="gc" style="grid-row:8;grid-column:2"></div>
+<div class="gc" style="grid-row:8;grid-column:3"></div>
+<div class="gc" style="grid-row:8;grid-column:4"></div>
+<div class="gc" style="grid-row:8;grid-column:5"></div>
+<div class="gc" style="grid-row:8;grid-column:6"></div>
+<div class="gc" style="grid-row:8;grid-column:7"></div>
+<div class="gc" style="grid-row:8;grid-column:8"></div>
+<div class="gc" style="grid-row:8;grid-column:9"></div>
+<div class="gc" style="grid-row:8;grid-column:10"></div>
+<div class="gc" style="grid-row:8;grid-column:11"></div>
+<div class="gc" style="grid-row:8;grid-column:12"></div>
+<div class="gc" style="grid-row:8;grid-column:13"></div>
+<div class="gc" style="grid-row:8;grid-column:14"></div>
+<div class="bar k-exec" style="grid-row:8;grid-column:8/10"></div>
+<div class="gl" style="grid-row:9;grid-column:1">Sampler rollout, wave 1 (12 sites)</div>
+<div class="gc" style="grid-row:9;grid-column:2"></div>
+<div class="gc" style="grid-row:9;grid-column:3"></div>
+<div class="gc" style="grid-row:9;grid-column:4"></div>
+<div class="gc" style="grid-row:9;grid-column:5"></div>
+<div class="gc" style="grid-row:9;grid-column:6"></div>
+<div class="gc" style="grid-row:9;grid-column:7"></div>
+<div class="gc" style="grid-row:9;grid-column:8"></div>
+<div class="gc" style="grid-row:9;grid-column:9"></div>
+<div class="gc" style="grid-row:9;grid-column:10"></div>
+<div class="gc" style="grid-row:9;grid-column:11"></div>
+<div class="gc" style="grid-row:9;grid-column:12"></div>
+<div class="gc" style="grid-row:9;grid-column:13"></div>
+<div class="gc" style="grid-row:9;grid-column:14"></div>
+<div class="bar k-exec" style="grid-row:9;grid-column:5/7"></div>
+<div class="gl" style="grid-row:10;grid-column:1">Sampler rollout, wave 2 (13 sites)</div>
+<div class="gc" style="grid-row:10;grid-column:2"></div>
+<div class="gc" style="grid-row:10;grid-column:3"></div>
+<div class="gc" style="grid-row:10;grid-column:4"></div>
+<div class="gc" style="grid-row:10;grid-column:5"></div>
+<div class="gc" style="grid-row:10;grid-column:6"></div>
+<div class="gc" style="grid-row:10;grid-column:7"></div>
+<div class="gc" style="grid-row:10;grid-column:8"></div>
+<div class="gc" style="grid-row:10;grid-column:9"></div>
+<div class="gc" style="grid-row:10;grid-column:10"></div>
+<div class="gc" style="grid-row:10;grid-column:11"></div>
+<div class="gc" style="grid-row:10;grid-column:12"></div>
+<div class="gc" style="grid-row:10;grid-column:13"></div>
+<div class="gc" style="grid-row:10;grid-column:14"></div>
+<div class="bar k-exec" style="grid-row:10;grid-column:7/10"></div>
+<div class="gl" style="grid-row:11;grid-column:1">Data platform sprints and dashboard</div>
+<div class="gc" style="grid-row:11;grid-column:2"></div>
+<div class="gc" style="grid-row:11;grid-column:3"></div>
+<div class="gc" style="grid-row:11;grid-column:4"></div>
+<div class="gc" style="grid-row:11;grid-column:5"></div>
+<div class="gc" style="grid-row:11;grid-column:6"></div>
+<div class="gc" style="grid-row:11;grid-column:7"></div>
+<div class="gc" style="grid-row:11;grid-column:8"></div>
+<div class="gc" style="grid-row:11;grid-column:9"></div>
+<div class="gc" style="grid-row:11;grid-column:10"></div>
+<div class="gc" style="grid-row:11;grid-column:11"></div>
+<div class="gc" style="grid-row:11;grid-column:12"></div>
+<div class="gc" style="grid-row:11;grid-column:13"></div>
+<div class="gc" style="grid-row:11;grid-column:14"></div>
+<div class="bar k-exec" style="grid-row:11;grid-column:4/11"></div>
+<div class="gl" style="grid-row:12;grid-column:1">Surge supply and logistics hub</div>
+<div class="gc" style="grid-row:12;grid-column:2"></div>
+<div class="gc" style="grid-row:12;grid-column:3"></div>
+<div class="gc" style="grid-row:12;grid-column:4"></div>
+<div class="gc" style="grid-row:12;grid-column:5"></div>
+<div class="gc" style="grid-row:12;grid-column:6"></div>
+<div class="gc" style="grid-row:12;grid-column:7"></div>
+<div class="gc" style="grid-row:12;grid-column:8"></div>
+<div class="gc" style="grid-row:12;grid-column:9"></div>
+<div class="gc" style="grid-row:12;grid-column:10"></div>
+<div class="gc" style="grid-row:12;grid-column:11"></div>
+<div class="gc" style="grid-row:12;grid-column:12"></div>
+<div class="gc" style="grid-row:12;grid-column:13"></div>
+<div class="gc" style="grid-row:12;grid-column:14"></div>
+<div class="bar k-exec" style="grid-row:12;grid-column:6/11"></div>
+<div class="gl" style="grid-row:13;grid-column:1">Workforce program and reserve roster</div>
+<div class="gc" style="grid-row:13;grid-column:2"></div>
+<div class="gc" style="grid-row:13;grid-column:3"></div>
+<div class="gc" style="grid-row:13;grid-column:4"></div>
+<div class="gc" style="grid-row:13;grid-column:5"></div>
+<div class="gc" style="grid-row:13;grid-column:6"></div>
+<div class="gc" style="grid-row:13;grid-column:7"></div>
+<div class="gc" style="grid-row:13;grid-column:8"></div>
+<div class="gc" style="grid-row:13;grid-column:9"></div>
+<div class="gc" style="grid-row:13;grid-column:10"></div>
+<div class="gc" style="grid-row:13;grid-column:11"></div>
+<div class="gc" style="grid-row:13;grid-column:12"></div>
+<div class="gc" style="grid-row:13;grid-column:13"></div>
+<div class="gc" style="grid-row:13;grid-column:14"></div>
+<div class="bar k-exec" style="grid-row:13;grid-column:5/14"></div>
+<div class="gl" style="grid-row:14;grid-column:1">Communication and community engagement</div>
+<div class="gc" style="grid-row:14;grid-column:2"></div>
+<div class="gc" style="grid-row:14;grid-column:3"></div>
+<div class="gc" style="grid-row:14;grid-column:4"></div>
+<div class="gc" style="grid-row:14;grid-column:5"></div>
+<div class="gc" style="grid-row:14;grid-column:6"></div>
+<div class="gc" style="grid-row:14;grid-column:7"></div>
+<div class="gc" style="grid-row:14;grid-column:8"></div>
+<div class="gc" style="grid-row:14;grid-column:9"></div>
+<div class="gc" style="grid-row:14;grid-column:10"></div>
+<div class="gc" style="grid-row:14;grid-column:11"></div>
+<div class="gc" style="grid-row:14;grid-column:12"></div>
+<div class="gc" style="grid-row:14;grid-column:13"></div>
+<div class="gc" style="grid-row:14;grid-column:14"></div>
+<div class="bar k-exec" style="grid-row:14;grid-column:3/15"></div>
+<div class="gl" style="grid-row:15;grid-column:1">Full-network operations and drills</div>
+<div class="gc" style="grid-row:15;grid-column:2"></div>
+<div class="gc" style="grid-row:15;grid-column:3"></div>
+<div class="gc" style="grid-row:15;grid-column:4"></div>
+<div class="gc" style="grid-row:15;grid-column:5"></div>
+<div class="gc" style="grid-row:15;grid-column:6"></div>
+<div class="gc" style="grid-row:15;grid-column:7"></div>
+<div class="gc" style="grid-row:15;grid-column:8"></div>
+<div class="gc" style="grid-row:15;grid-column:9"></div>
+<div class="gc" style="grid-row:15;grid-column:10"></div>
+<div class="gc" style="grid-row:15;grid-column:11"></div>
+<div class="gc" style="grid-row:15;grid-column:12"></div>
+<div class="gc" style="grid-row:15;grid-column:13"></div>
+<div class="gc" style="grid-row:15;grid-column:14"></div>
+<div class="bar k-exec" style="grid-row:15;grid-column:10/14"></div>
+<div class="gl" style="grid-row:16;grid-column:1">Monitoring and controlling</div>
+<div class="gc" style="grid-row:16;grid-column:2"></div>
+<div class="gc" style="grid-row:16;grid-column:3"></div>
+<div class="gc" style="grid-row:16;grid-column:4"></div>
+<div class="gc" style="grid-row:16;grid-column:5"></div>
+<div class="gc" style="grid-row:16;grid-column:6"></div>
+<div class="gc" style="grid-row:16;grid-column:7"></div>
+<div class="gc" style="grid-row:16;grid-column:8"></div>
+<div class="gc" style="grid-row:16;grid-column:9"></div>
+<div class="gc" style="grid-row:16;grid-column:10"></div>
+<div class="gc" style="grid-row:16;grid-column:11"></div>
+<div class="gc" style="grid-row:16;grid-column:12"></div>
+<div class="gc" style="grid-row:16;grid-column:13"></div>
+<div class="gc" style="grid-row:16;grid-column:14"></div>
+<div class="bar k-ctrl" style="grid-row:16;grid-column:3/15"></div>
+<div class="gl" style="grid-row:17;grid-column:1">Closing and handover</div>
+<div class="gc" style="grid-row:17;grid-column:2"></div>
+<div class="gc" style="grid-row:17;grid-column:3"></div>
+<div class="gc" style="grid-row:17;grid-column:4"></div>
+<div class="gc" style="grid-row:17;grid-column:5"></div>
+<div class="gc" style="grid-row:17;grid-column:6"></div>
+<div class="gc" style="grid-row:17;grid-column:7"></div>
+<div class="gc" style="grid-row:17;grid-column:8"></div>
+<div class="gc" style="grid-row:17;grid-column:9"></div>
+<div class="gc" style="grid-row:17;grid-column:10"></div>
+<div class="gc" style="grid-row:17;grid-column:11"></div>
+<div class="gc" style="grid-row:17;grid-column:12"></div>
+<div class="gc" style="grid-row:17;grid-column:13"></div>
+<div class="gc" style="grid-row:17;grid-column:14"></div>
+<div class="bar k-close" style="grid-row:17;grid-column:13/15"></div>
+<div class="gl" style="grid-row:18;grid-column:1"><strong>Milestones</strong></div>
+<div class="gc" style="grid-row:18;grid-column:2"></div>
+<div class="gc" style="grid-row:18;grid-column:3"></div>
+<div class="gc" style="grid-row:18;grid-column:4"></div>
+<div class="gc" style="grid-row:18;grid-column:5"></div>
+<div class="gc" style="grid-row:18;grid-column:6"></div>
+<div class="gc" style="grid-row:18;grid-column:7"></div>
+<div class="gc" style="grid-row:18;grid-column:8"></div>
+<div class="gc" style="grid-row:18;grid-column:9"></div>
+<div class="gc" style="grid-row:18;grid-column:10"></div>
+<div class="gc" style="grid-row:18;grid-column:11"></div>
+<div class="gc" style="grid-row:18;grid-column:12"></div>
+<div class="gc" style="grid-row:18;grid-column:13"></div>
+<div class="gc" style="grid-row:18;grid-column:14"></div>
+<div class="ms" style="grid-row:18;grid-column:3" title="Charter approved"></div>
+<div class="ms" style="grid-row:18;grid-column:7" title="Dashboard public"></div>
+<div class="ms" style="grid-row:18;grid-column:9" title="Lab open"></div>
+<div class="ms" style="grid-row:18;grid-column:12" title="Live drill"></div>
+<div class="ms" style="grid-row:18;grid-column:14" title="Handover Dec 31, 2029"></div>
+</div></div>
+<div class="legend"><span>Milestones, in order: Charter approved (end of Q1 2027); Dashboard public (end of Q1 2028); Lab open (end of Q3 2028); Live drill (end of Q2 2029); Handover Dec 31, 2029.</span></div>
+
+  <h3>Detection-to-response flow chart</h3>
+  <p>The flow chart shows what the finished system does every week. It is the operating picture that the schedule is building toward.</p>
+  <div class="scroll"><svg class="flow" viewBox="0 0 1100 330" role="img" aria-label="Flow chart: sewer sampling, UFV laboratory, data platform, decision on whether a signal exceeds the threshold. If yes, alert Fraser Health, targeted response, and public dashboard update. If no, routine monitoring continues.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--muted)"/></marker></defs>
+    <text class="hd" x="20" y="24">TWICE-WEEKLY CYCLE</text>
+    <rect class="bx" x="20" y="50" width="170" height="80" rx="6"/>
+    <text x="105" y="82" text-anchor="middle">Sample collection</text><text x="105" y="102" text-anchor="middle">25 sites, 2 to 3 times</text><text x="105" y="118" text-anchor="middle">a week</text>
+    <rect class="bx" x="240" y="50" width="170" height="80" rx="6"/>
+    <text x="325" y="82" text-anchor="middle">UFV laboratory</text><text x="325" y="102" text-anchor="middle">PCR testing, variant</text><text x="325" y="118" text-anchor="middle">sequencing</text>
+    <rect class="bx" x="460" y="50" width="170" height="80" rx="6"/>
+    <text x="545" y="82" text-anchor="middle">Data platform</text><text x="545" y="102" text-anchor="middle">Quality checks, trend</text><text x="545" y="118" text-anchor="middle">and threshold rules</text>
+    <path class="bx" d="M740 90 L815 50 L890 90 L815 130 Z"/>
+    <text x="815" y="86" text-anchor="middle">Signal above</text><text x="815" y="102" text-anchor="middle">threshold?</text>
+    <path class="ln" d="M190 90 H238" marker-end="url(#ar)"/><path class="ln" d="M410 90 H458" marker-end="url(#ar)"/><path class="ln" d="M630 90 H738" marker-end="url(#ar)"/>
+    <path class="ln" d="M890 90 H940" marker-end="url(#ar)"/><text class="lb" x="900" y="80">NO</text>
+    <rect class="bx" x="940" y="50" width="140" height="80" rx="6"/>
+    <text x="1010" y="82" text-anchor="middle">Routine</text><text x="1010" y="102" text-anchor="middle">monitoring</text><text x="1010" y="118" text-anchor="middle">continues</text>
+    <path class="ln" d="M1010 50 V28 H105 V48" marker-end="url(#ar)"/><text class="lb" x="540" y="22">NEXT CYCLE</text>
+    <path class="ln" d="M815 130 V196" marker-end="url(#ar)"/><text class="lb" x="825" y="168">YES, within 24 hours</text>
+    <text class="hd" x="20" y="198">RESPONSE CHAIN</text>
+    <rect class="bx alert" x="715" y="200" width="200" height="90" rx="6"/>
+    <text x="815" y="232" text-anchor="middle">Private alert to Fraser</text><text x="815" y="250" text-anchor="middle">Health medical health</text><text x="815" y="268" text-anchor="middle">officer</text>
+    <rect class="bx alert" x="455" y="200" width="200" height="90" rx="6"/>
+    <text x="555" y="232" text-anchor="middle">Targeted response</text><text x="555" y="250" text-anchor="middle">Testing, outbreak support,</text><text x="555" y="268" text-anchor="middle">supplies released from hub</text>
+    <rect class="bx" x="195" y="200" width="200" height="90" rx="6"/>
+    <text x="295" y="232" text-anchor="middle">Public update</text><text x="295" y="250" text-anchor="middle">Dashboard and community</text><text x="295" y="268" text-anchor="middle">notice, multilingual</text>
+    <path class="ln" d="M715 245 H657" marker-end="url(#ar)"/><path class="ln" d="M455 245 H397" marker-end="url(#ar)"/>
+  </svg></div>
+
+  </section>
+
+<section id="scope"><h2>2. Scope</h2>
+  <p>Scope is what the project will and will not do. The project delivers the eight deliverables listed above for the six municipalities of the Fraser Valley Regional District and the surrounding rural and First Nations communities <a class="cite" href="#ref-fvrd22">(Fraser Valley Regional District, 2022)</a>. It is a surveillance and preparedness project. It is not a hospital build, a vaccine program or a substitute for the BCCDC; the laboratory will be integrated into the provincial system and will share data with it <a class="cite" href="#ref-bccdc">(BC Centre for Disease Control, n.d.)</a>.</p>
+  <div class="grid2">
+    <div class="box"><h4>In scope</h4><ul>
+      <li>Sampling at 25 sites and mobile units</li>
+      <li>Laboratory building, equipment, accreditation, sequencing</li>
+      <li>Data platform, dashboard and alert protocol with Fraser Health</li>
+      <li>Targeted monitoring for avian influenza exposure and congregate care</li>
+      <li>Supply hub, drills, training, community communication</li>
+      <li>Audit, evaluation and handover</li>
+    </ul></div>
+    <div class="box"><h4>Out of scope</h4><ul>
+      <li>New acute-care hospital beds</li>
+      <li>Vaccine or drug research and development</li>
+      <li>Changes to provincial or federal public health law</li>
+      <li>Border and quarantine policy (federal responsibility)</li>
+      <li>Treatment-plant upgrades beyond sampling access</li>
+      <li>Individual-level tracking of people</li>
+    </ul></div>
+  </div>
+  <h4>Work breakdown structure (top level)</h4>
+  <p>1 Management and governance; 2 Sampling network; 3 Laboratory; 4 Data and alerts; 5 Facility and agricultural monitoring; 6 Surge hub; 7 Workforce; 8 Communication; 9 Close-out. During planning, each is divided into work packages, each with an owner, a budget and an acceptance test.</p>
+  <h4>Scope control</h4>
+  <p>Any change that affects cost or moves a milestone goes to a change control board made up of the project manager, a finance officer, the clinical champion and a community member. Changes under $250,000 and expected to take less than two weeks can be approved by the project manager; larger changes must be approved by the board, and anything involving the contingency must be approved by the sponsor. These thresholds are team estimates.</p>
+</section>
+
+<section id="cost"><h2>3. Cost</h2>
+  <p>The $1,000,000,000 is allocated across twelve lines. The idea is to invest where the evidence shows the Valley is weakest: laboratory capacity and trained staff, which held back the BCCDC's own expansion <a class="cite" href="#ref-zeidler">(Zeidler, 2023)</a>, and the link between data and action, which the Auditor General identified as a weak area <a class="cite" href="#ref-oag">(Auditor General of Canada, 2021)</a>. Sampling itself is deliberately a smaller share because unit costs are low <span class="cite">(<a class="cite" href="#ref-mathematica">Mathematica, n.d.</a>; <a class="cite" href="#ref-path">PATH, n.d.</a>)</span>. The laboratory build, equipment and operations figures are team estimates for a proposal-stage budget; the laboratory guide used for planning lists the staff, space, equipment and quality systems that need to be priced <a class="cite" href="#ref-aphl">(Association of Public Health Laboratories, 2026)</a>.</p>
+  <div class="scroll"><table><thead><tr><th>Budget line</th><th class="num">$ million</th><th class="num">Share</th><th>Basis</th></tr></thead><tbody>
+<tr><td>Sampling network: sites, autosamplers, sewer access, mobile units</td><td class="num">60</td><td class="num">6%</td><td>25 sites including the JAMES and Chilliwack plants <span class="cite">(<a class="cite" href="#ref-abby">City of Abbotsford, n.d.</a>; <a class="cite" href="#ref-chwk">City of Chilliwack, n.d.</a>)</span>; BCCDC samples two to three times weekly <a class="cite" href="#ref-bccdc">(BC Centre for Disease Control, n.d.)</a>.</td></tr>
+<tr><td>UFV Fraser Valley Pathogen Laboratory: build and equip</td><td class="num">180</td><td class="num">18%</td><td>Space, equipment and contamination-control layout are core lab requirements <a class="cite" href="#ref-aphl">(Association of Public Health Laboratories, 2026)</a>; equipment and staff limited BC's expansion <a class="cite" href="#ref-zeidler">(Zeidler, 2023)</a>.</td></tr>
+<tr><td>Laboratory and field operations, 2027 to 2029</td><td class="num">150</td><td class="num">15%</td><td>Published per-sample costs range from $34 to $517 <a class="cite" href="#ref-mathematica">(Mathematica, n.d.)</a>; budgeted generously because of sequencing.</td></tr>
+<tr><td>Data platform, dashboard and analytics</td><td class="num">70</td><td class="num">7%</td><td>Modelled on the BCCDC dashboard <a class="cite" href="#ref-bccdc">(BC Centre for Disease Control, n.d.)</a>; Omicron showed the value of reliable data <a class="cite" href="#ref-kulkarni">(Kulkarni, 2025)</a>.</td></tr>
+<tr><td>Facility-level and agricultural monitoring</td><td class="num">90</td><td class="num">9%</td><td>Congregate care <a class="cite" href="#ref-phac23">(Public Health Agency of Canada, 2023)</a>, poultry <a class="cite" href="#ref-graber">(Graber, 2024)</a>, and airport sampling <a class="cite" href="#ref-overton">(Overton et al., 2024)</a>.</td></tr>
+<tr><td>Surge supply and logistics hub</td><td class="num">110</td><td class="num">11%</td><td>Responds to the Auditor General's preparedness findings <a class="cite" href="#ref-oag">(Auditor General of Canada, 2021)</a>.</td></tr>
+<tr><td>Workforce and training</td><td class="num">60</td><td class="num">6%</td><td>UFV pathway and reserve roster; staffing was a bottleneck <a class="cite" href="#ref-zeidler">(Zeidler, 2023)</a>.</td></tr>
+<tr><td>Communication and community engagement</td><td class="num">30</td><td class="num">3%</td><td>Multilingual and First Nations partnership work.</td></tr>
+<tr><td>Research and partnerships (BCCDC, universities)</td><td class="num">50</td><td class="num">5%</td><td>Pathogen panels and method validation; multi-pathogen testing <a class="cite" href="#ref-kulkarni">(Kulkarni, 2025)</a>.</td></tr>
+<tr><td>Contingency reserve (10%)</td><td class="num">100</td><td class="num">10%</td><td>Held by the sponsor; used for residual and accepted risks.</td></tr>
+<tr><td>Governance, project office, audit and evaluation</td><td class="num">40</td><td class="num">4%</td><td>Independent audit and quarterly gate reviews.</td></tr>
+<tr><td>Sustainment fund for post-2029 operations</td><td class="num">60</td><td class="num">6%</td><td>Bridges to a long-term operating agreement; addresses funding-loss risk <a class="cite" href="#ref-kulkarni">(Kulkarni, 2025)</a>.</td></tr>
+</tbody><tfoot><tr><td>Total</td><td class="num">1,000</td><td class="num">100%</td><td>All figures are team estimates for proposal stage</td></tr></tfoot></table></div>
+  <h4>Phasing by year (team estimate)</h4>
+  <div class="scroll"><table style="min-width:420px"><thead><tr><th>Year</th><th class="num">Spend ($ million)</th><th>Main activity</th></tr></thead><tbody>
+    <tr><td>2027</td><td class="num">300</td><td>Planning, site agreements, laboratory design and start of construction, first sampler wave</td></tr>
+    <tr><td>2028</td><td class="num">400</td><td>Laboratory fit-out, accreditation, second sampler wave, platform and hub build</td></tr>
+    <tr><td>2029</td><td class="num">300</td><td>Full operations, drills, workforce, closeout and sustainment fund transfer</td></tr>
+    <tr><td><strong>Total</strong></td><td class="num"><strong>1,000</strong></td><td></td></tr>
+  </tbody></table></div>
+  <h4>How the cost is estimated and controlled</h4>
+  <p>During the proposal phase I use analogous and parametric estimates, drawing on published per-sample and program costs <span class="cite">(<a class="cite" href="#ref-mathematica">Mathematica, n.d.</a>; <a class="cite" href="#ref-sanjak">Sanjak et al., 2024</a>)</span>. In planning, estimates become bottom-up, based on vendor quotations and design drawings. During execution the project tracks earned value, and any forecast overrun above 5% on a work package triggers a recovery plan. The $100 million contingency (10%) is held by the sponsor, not the project manager. Following the Project Management Institute <a class="cite" href="#ref-pmi">(Project Management Institute, 2021)</a>, the baseline changes only through the change control board.</p>
+
+  </section>
+
+<section id="stakeholders"><h2>4. Stakeholders</h2><div class="scroll"><table>
+    <thead><tr><th>Stakeholder</th><th>What they want</th><th>Influence</th><th>Interest</th></tr></thead>
+    <tbody>
+      <tr><td>Government of Canada and Public Health Agency of Canada</td><td>Value for $1 billion; a better early warning system than in 2020 <a class="cite" href="#ref-oag">(Auditor General of Canada, 2021)</a></td><td>High</td><td>High</td></tr>
+      <tr><td>Province of BC and the BCCDC</td><td>A compatible lab and data flow, no duplicated work <a class="cite" href="#ref-bccdc">(BC Centre for Disease Control, n.d.)</a></td><td>High</td><td>High</td></tr>
+      <tr><td>Fraser Health and its medical health officers</td><td>Trusted alerts they can act on</td><td>High</td><td>High</td></tr>
+      <tr><td>UFV leadership, faculty, staff and students</td><td>A lab, research and teaching opportunities, no distraction from core teaching</td><td>High</td><td>High</td></tr>
+      <tr><td>City of Abbotsford, City of Chilliwack, District of Mission, Fraser Valley Regional District</td><td>Plant access, no added burden on plants already near capacity <a class="cite" href="#ref-gnews23">(Global News, 2023)</a></td><td>High</td><td>Medium</td></tr>
+      <tr><td>First Nations in the region</td><td>Respectful participation, data governance and a say in how results are used</td><td>High</td><td>High</td></tr>
+      <tr><td>Long-term care and assisted-living operators</td><td>Early warning for residents; minimal paperwork</td><td>Medium</td><td>High</td></tr>
+      <tr><td>Poultry producers and processors</td><td>Early signals without unfair blame or closure <a class="cite" href="#ref-graber">(Graber, 2024)</a></td><td>Medium</td><td>High</td></tr>
+      <tr><td>School districts (33, 34, 75, 78)</td><td>Safe schools and clear communication <a class="cite" href="#ref-ufvsem">(University of the Fraser Valley, 2022)</a></td><td>Medium</td><td>Medium</td></tr>
+      <tr><td>Residents, including newcomers and seniors</td><td>Privacy, clear information in their language, no new restrictions without evidence</td><td>Low</td><td>High</td></tr>
+      <tr><td>Equipment, construction and software vendors</td><td>Fair contracts and payment</td><td>Medium</td><td>Medium</td></tr>
+      <tr><td>Auditors and the course instructor</td><td>Transparent, documented work</td><td>High</td><td>Medium</td></tr>
+    </tbody></table></div>
+
+  </section>
+
+<section id="spheres"><h2>5. Three spheres of systems management</h2><p>Schwalbe's systems view suggests that the manager should consider the business, organizational and technology spheres together <a class="cite" href="#ref-schwalbe">(Schwalbe, 2019)</a>.</p>
+  <div class="grid2">
+    <div class="box"><h4>Business</h4><p>The business question is value: a billion public dollars must deliver measurable protection and a plan for after 2029. The sustainment fund, the handover agreement and the ROI analysis answer it.</p></div>
+    <div class="box"><h4>Organization</h4><p>Several organizations with different cultures need to work together: a university, a health authority, municipal utilities, First Nations and farms. Governance, agreements and a steering committee make that possible.</p></div>
+    <div class="box"><h4>Technology</h4><p>PCR and sequencing laboratory methods, sampling equipment, secure data storage and a dashboard. Technology choices follow established laboratory practice <a class="cite" href="#ref-aphl">(Association of Public Health Laboratories, 2026)</a> and are linked with provincial data <a class="cite" href="#ref-bccdc">(BC Centre for Disease Control, n.d.)</a>.</p></div>
+  </div>
+
+  </section>
+
+<section id="frames"><h2>6. Four frames of organizations, applied to UFV</h2><p>Bolman and Deal's four frames <a class="cite" href="#ref-bolman">(Bolman &amp; Deal, 2017)</a> offer four ways to read UFV, each pointing to a different management action.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Frame</th><th>What it shows at UFV</th><th>What the project does</th></tr></thead>
+    <tbody>
+      <tr><td>Structural</td><td>Faculties, departments and campuses in four communities <a class="cite" href="#ref-ufvcamp">(University of the Fraser Valley, n.d.-a)</a>, with formal approvals</td><td>Clear reporting lines, a project office inside UFV, written agreements with each partner</td></tr>
+      <tr><td>Human resource</td><td>Faculty and staff with teaching loads; students who want experience</td><td>Paid co-op placements, backfill for seconded faculty, training and career paths</td></tr>
+      <tr><td>Political</td><td>Competition for space and funds; a public university serving four school districts <a class="cite" href="#ref-ufvsem">(University of the Fraser Valley, 2022)</a></td><td>Early coalition building, transparent allocation of lab time, a steering committee with every partner</td></tr>
+      <tr><td>Symbolic</td><td>A regional university that sees itself as part of the community</td><td>Name and brand the lab as the Valley's own, celebrate milestones, share stories of detected-and-contained outbreaks</td></tr>
+    </tbody></table></div>
+</section>
+
+<section id="champion"><h2>7. Champion</h2><p>A project this big needs a senior person who speaks up for it in rooms the project manager is not in. I propose two. The executive champion is a senior UFV officer, such as the Vice-President responsible for research, who protects the laboratory's place in the university's plans. The clinical champion is a Fraser Health medical health officer, who owns the alert pathway and vouches for the credibility of the data. Naming the actual people would be part of pre-initiation; I have not assumed anyone has agreed.</p>
+
+  </section>
+
+<section id="deliverables"><h2>8. Deliverables</h2><ol>
+    <li><strong>D1 Sampling network.</strong> 25 fixed and facility sites and mobile units, with signed access agreements.</li>
+    <li><strong>D2 UFV Fraser Valley Pathogen Laboratory.</strong> Constructed, fitted out, staffed and validated.</li>
+    <li><strong>D3 Data and alert platform.</strong> Secure database, analytics, public dashboard and private alert line.</li>
+    <li><strong>D4 Facility and agricultural monitoring program.</strong> Targeted sampling of care homes, hospitals, schools, shelters, poultry-processing plants and the airport.</li>
+    <li><strong>D5 Surge supply and logistics hub.</strong> Stockpile, cold chain and distribution plan.</li>
+    <li><strong>D6 Workforce program.</strong> A UFV training pathway and a trained reserve roster.</li>
+    <li><strong>D7 Communication and engagement plan.</strong> Delivered in partnership with First Nations and multilingual community groups.</li>
+    <li><strong>D8 Sustainment and handover package.</strong> Operating agreement, final report, lessons learned and audited accounts.</li>
+  </ol>
+</section>
+
+<section id="lifecycle"><h2>9. Project life cycle model</h2><p>Schwalbe <a class="cite" href="#ref-schwalbe">(Schwalbe, 2019)</a> contrasts predictive development cycles (waterfall) with iterative ones (spiral and agile). For this project I chose a <strong>predictive, stage-gated waterfall</strong>, with <strong>iterative sprints within the data platform</strong>. Waterfall fits because the scope is well known, the laboratory build has a strict sequence (design, construction, commissioning, accreditation), and public funds require a formal gate before each tranche is released. In a pure spiral model the budget would be hidden in repeated prototypes. The data platform is different: dashboards and alert rules improve with user feedback from Fraser Health and the public, so they are developed in two-month sprints between the gates.</p>
+
+  </section>
+
+<section id="processes"><h2>10. The five process groups</h2><div class="scroll"><table>
+    <thead><tr><th>Group</th><th>When</th><th>What happens</th><th>Main outputs</th></tr></thead>
+    <tbody>
+      <tr><td>Initiating</td><td>Jan 2027</td><td>Authorize the project, name the sponsor, champion and manager, and identify stakeholders.</td><td>Signed charter, stakeholder register</td></tr>
+      <tr><td>Planning</td><td>Feb to Jun 2027</td><td>Define scope, schedule, budget, quality, resources, communication, risk and procurement plans.</td><td>Project management plan and baselines <a class="cite" href="#ref-pmi">(Project Management Institute, 2021)</a></td></tr>
+      <tr><td>Executing</td><td>Q2 2027 to Q3 2029</td><td>Build the network, laboratory, platform, hub and workforce; run drills.</td><td>Deliverables D1 to D7</td></tr>
+      <tr><td>Monitoring and controlling</td><td>Jan 2027 to Dec 2029</td><td>Track earned value, quality and risk; run change control; report to the steering committee.</td><td>Status reports, change log, corrective actions</td></tr>
+      <tr><td>Closing</td><td>Q3 to Q4 2029</td><td>Audit, hand over, release staff and contracts, record lessons.</td><td>D8, final report, signed acceptance</td></tr>
+    </tbody></table></div>
+
+  </section>
+
+<section id="preinit"><h2>11. Pre-initiation tasks</h2><p>Before the project is formally approved, the team carries out the work that decides whether it should go ahead. These tasks run from late November 2026 to January 2027.</p>
+  <ul>
+    <li>Confirm the business need using the evidence in this proposal and a short needs assessment with Fraser Health and the BCCDC.</li>
+    <li>Identify a sponsor and both champions, and secure letters of support from the City of Abbotsford, the City of Chilliwack, the District of Mission and the Fraser Valley Regional District.</li>
+    <li>Open early conversations with First Nations governments about participation and data governance.</li>
+    <li>Check feasibility: laboratory site options, flood exposure of plant locations <a class="cite" href="#ref-fvc22">(Fraser Valley Current, 2022)</a>, and plant capacity limits <a class="cite" href="#ref-gnews23">(Global News, 2023)</a>.</li>
+    <li>Complete a privacy impact assessment and an ethics review for wastewater data.</li>
+    <li>Draft the preliminary scope statement, rough-order-of-magnitude budget and funding conditions.</li>
+    <li>Prepare the charter for approval.</li>
+  </ul>
+
+  </section>
+
+<section id="reports"><h2>12. Progress reports</h2><p>The project reports on a regular schedule so that bad news travels quickly. Each month the project manager issues a status report to everyone involved, including percent complete, earned value indices (schedule and cost performance), top risks, top issues and decisions required. Each quarter the steering committee receives a gate review rated on scope, time, cost, quality and risk using a traffic-light system. Each tranche of funding is released only after the quarterly review. A public progress page repeats the headline measures: sites online, laboratory milestones and dashboard availability.</p>
+</section>
+
+<section id="swot"><h2>13. SWOT analysis</h2>
+  <div class="swot">
+    <div class="box"><h4>Strengths</h4><ul>
+      <li>UFV's regional mandate and four-community footprint <span class="cite">(<a class="cite" href="#ref-ufvcamp">University of the Fraser Valley, n.d.-a</a>; <a class="cite" href="#ref-ufvsem">University of the Fraser Valley, 2022</a>)</span></li>
+      <li>A strong evidence base for wastewater lead time <span class="cite">(<a class="cite" href="#ref-xie">Xie et al., 2022</a>; <a class="cite" href="#ref-overton">Overton et al., 2024</a>)</span></li>
+      <li>Low unit cost of sampling <span class="cite">(<a class="cite" href="#ref-mathematica">Mathematica, n.d.</a>; <a class="cite" href="#ref-path">PATH, n.d.</a>)</span></li>
+      <li>An established BC program to connect with <a class="cite" href="#ref-bccdc">(BC Centre for Disease Control, n.d.)</a></li>
+      <li>A large, trainable student population <a class="cite" href="#ref-ufvabout">(University of the Fraser Valley, n.d.-b)</a></li>
+    </ul></div>
+    <div class="box"><h4>Weaknesses</h4><ul>
+      <li>A brand-new laboratory team with no track record</li>
+      <li>Dependence on municipal plants and partners for access</li>
+      <li>Heavy fixed-date pressure on a large construction project</li>
+      <li>Operating funds after 2029 not yet secured</li>
+    </ul></div>
+    <div class="box"><h4>Opportunities</h4><ul>
+      <li>A funding gap after the BC program's funding reportedly ended <a class="cite" href="#ref-kulkarni">(Kulkarni, 2025)</a></li>
+      <li>Avian influenza monitoring where the risk is concentrated <span class="cite">(<a class="cite" href="#ref-graber">Graber, 2024</a>; <a class="cite" href="#ref-fhhpai">Fraser Health, n.d.</a>)</span></li>
+      <li>Multi-pathogen testing, including enteric disease and antimicrobial resistance <a class="cite" href="#ref-kulkarni">(Kulkarni, 2025)</a></li>
+      <li>Rapid regional population growth that raises the value of surveillance <a class="cite" href="#ref-fvrd25">(Fraser Valley Regional District, 2025)</a></li>
+    </ul></div>
+    <div class="box"><h4>Threats</h4><ul>
+      <li>Plants already near capacity and flood-exposed <span class="cite">(<a class="cite" href="#ref-gnews23">Global News, 2023</a>; <a class="cite" href="#ref-fvc22">Fraser Valley Current, 2022</a>)</span></li>
+      <li>Loss of public and political interest when no pandemic is visible <a class="cite" href="#ref-kulkarni">(Kulkarni, 2025)</a></li>
+      <li>Privacy concerns about any sewage-based monitoring</li>
+      <li>Competition for scarce laboratory and data staff <a class="cite" href="#ref-zeidler">(Zeidler, 2023)</a></li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="roi"><h2>14. Return on investment and payback</h2><p>Public health does not make money; the return is the losses avoided. Canada's shutdown cost over $170 billion in a year <a class="cite" href="#ref-queens">(Cotton et al., 2020)</a>, or about $14.2 billion per month. The Valley's off-reserve population is approximately 318,000 <a class="cite" href="#ref-fvrdind">(Fraser Valley Regional District, n.d.)</a>, about 0.9% of Canada's population (team estimate, using a national population of about 37 million). Applying that share gives roughly <strong>$120 million of regional output lost for each month of pandemic-scale restrictions</strong>. This is a rough, proportional estimate, and I treat it only as an order of magnitude.</p>
+  <div class="scroll"><table style="min-width:560px"><thead><tr><th>Months of pandemic-scale restriction avoided</th><th class="num">Avoided loss ($ million)</th><th class="num">Net benefit ($ million)</th><th class="num">ROI</th></tr></thead><tbody>
+    <tr><td>2</td><td class="num">240</td><td class="num">-760</td><td class="num">-76%</td></tr>
+    <tr><td>4</td><td class="num">480</td><td class="num">-520</td><td class="num">-52%</td></tr>
+    <tr><td>8</td><td class="num">960</td><td class="num">-40</td><td class="num">-4%</td></tr>
+    <tr><td>12</td><td class="num">1,440</td><td class="num">440</td><td class="num">+44%</td></tr>
+  </tbody></table></div>
+  <p>ROI is calculated as (benefit minus cost) divided by cost. Under these assumptions the project breaks even if it helps avoid roughly eight to nine months of pandemic-scale restrictions in the Valley. That is a high bar for one event, so I do not claim the money pays for itself through COVID-style savings alone. The case rests on three further points. The network can detect many kinds of threats (respiratory viruses, enteric disease and avian influenza), since these show up in wastewater <span class="cite">(<a class="cite" href="#ref-kulkarni">Kulkarni, 2025</a>; <a class="cite" href="#ref-fhhpai">Fraser Health, n.d.</a>)</span>. Warnings can shorten restrictions rather than prevent them entirely, because decisions can be targeted at specific sites such as poultry plants and care homes. The benefits also include lives and hospital capacity, which are not captured in GDP figures: by September 2023 Canada had 64,623 ICU admissions <a class="cite" href="#ref-phac26">(Public Health Agency of Canada, 2026)</a>. The project's operating cost after 2029 is covered by the $60 million sustainment fund and the handover agreement, so the payback period is judged against avoided loss, not revenue.</p>
+</section>
+
+<section id="quality"><h2>15. Project quality management</h2><p>Quality here has two dimensions: the project is delivered correctly, and the product (the laboratory result) is reliable. Both use the PMBOK approach of planning quality, managing quality through process audits, and controlling quality through inspection and testing <a class="cite" href="#ref-pmi">(Project Management Institute, 2021)</a>. Laboratory quality is built on personnel competency, a contamination-control layout and a documented quality management system <a class="cite" href="#ref-aphl">(Association of Public Health Laboratories, 2026)</a>. Results are checked against the provincial program before the dashboard is released, because a false alarm leads to a loss of trust and a missed signal defeats the point of the project.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Quality measure</th><th>Target (team estimate)</th></tr></thead>
+    <tbody>
+      <tr><td>Laboratory turnaround from sample receipt to result</td><td>48 hours or less</td></tr>
+      <tr><td>Scheduled samples successfully collected</td><td>95% or more</td></tr>
+      <tr><td>Data platform availability</td><td>99% or more</td></tr>
+      <tr><td>Agreement with provincial laboratory on shared samples</td><td>Within pre-agreed tolerance</td></tr>
+      <tr><td>Alert reaches the medical health officer after threshold crossing</td><td>Within 24 hours</td></tr>
+      <tr><td>Deliverables accepted at first review</td><td>90% or more</td></tr>
+    </tbody></table></div>
+
+  </section>
+
+<section id="charter"><h2>16. Project charter</h2><dl class="charter"><dt>Project identification</dt><dd>Fraser Valley Early Warning Network (FVEWN)</dd><dt>Activity</dt><dd>Early warning identification of infectious threats in the Fraser Valley before clinical systems detect them, and making sure a warning results in a tested response.</dd><dt>Funding</dt><dd>$1,000,000,000 federal funding, including a 10% contingency and a sustainment fund.</dd><dt>Sponsor</dt><dd>Chaacha &amp; UFV executive sponsor, accountable for funds and benefits.</dd><dt>Project manager</dt><dd>[Your name], within the scope, schedule and budget of the approved baseline.</dd><dt>Dates</dt><dd>Pre-initiation Nov 2026; project approval Jan 2027; close-out complete December 31, 2029.</dd><dt>Objectives</dt><dd>1. Sample 25 sites at least twice per week by September 30, 2028. 2. Laboratory accredited and open by September 30, 2028. 3. Public dashboard live by June 30, 2028. 4. Two full-scale tabletop and live drills by September 30, 2029. 5. Final handover signed by December 31, 2029. (Team targets.)</dd><dt>Success criteria</dt><dd>On time (within 5%), within budget (within the contingency), audited, and an operating agreement for 2030 and beyond.</dd><dt>Assumptions</dt><dd>Municipal plant owners agree to sampling; UFV can provide a site for the laboratory; funding is released annually.</dd><dt>Limits</dt><dd>Fixed end date; public procurement rules; privacy law; flood-prone plant sites <a class="cite" href="#ref-fvc22">(Fraser Valley Current, 2022)</a>.</dd><dt>Approval</dt><dd>Signature lines for sponsor, champion and course instructor (to be filled out).</dd></dl>
+
+  </section>
+
+<section id="testing"><h2>17. Testing and the cost of quality</h2><p>Testing is carried out at every level. In the laboratory: negative and positive controls in each run, recovery tests using known virus added to samples, and regular blind proficiency samples exchanged with the BCCDC. In the platform: unit and acceptance tests for each sprint, penetration testing before launch and a data-reconciliation check against manual entry. In the response chain: a tabletop exercise and two live drills with Fraser Health, in which a simulated signal is followed from the sewer to a public notice. Construction is accepted only after commissioning tests are passed.</p>
+  <p>The cost of quality has four components. Money spent on <strong>prevention</strong> (training, design reviews, standard procedures) and <strong>appraisal</strong> (inspection, proficiency testing, audits) is spent to get it right. <strong>Internal failure</strong> (repeating runs, rejecting samples) and <strong>external failure</strong> (a missed or false alert reaching the public) are the cost of getting it wrong. The plan focuses on prevention and appraisal because external failure is by far the most costly. I budget around 8% of laboratory and platform spending for prevention and appraisal (team estimate).</p>
+</section>
+
+<section id="hr"><h2>18. Project human resource management</h2><p>The project requires people the Valley does not yet have in quantity. The BCCDC has said that it lacked enough trained staff and equipment to scale up wastewater testing <a class="cite" href="#ref-zeidler">(Zeidler, 2023)</a>. The strategy combines hiring, secondment and contracting. The headcount below is a team estimate for peak operations in 2028 and 2029.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Role</th><th class="num">Peak FTE</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>Project manager, deputy and project office</td><td class="num">6</td><td>Hire</td></tr>
+      <tr><td>Laboratory director and scientists</td><td class="num">12</td><td>Hire, with UFV faculty secondments</td></tr>
+      <tr><td>Laboratory technologists</td><td class="num">10</td><td>Hire; UFV graduates</td></tr>
+      <tr><td>Field sampling technicians</td><td class="num">14</td><td>Hire, with First Nations and municipal partners</td></tr>
+      <tr><td>Data scientists and software engineers</td><td class="num">8</td><td>Hire plus contract</td></tr>
+      <tr><td>Epidemiologists (liaison with Fraser Health)</td><td class="num">3</td><td>Secondment from Fraser Health</td></tr>
+      <tr><td>Communication and community liaison</td><td class="num">6</td><td>Hire</td></tr>
+      <tr><td>Procurement, contracts and finance</td><td class="num">5</td><td>Hire</td></tr>
+      <tr><td>Logistics and supply hub staff</td><td class="num">8</td><td>Hire</td></tr>
+    </tbody></table></div>
+  <p>Hiring of the director and project office starts in Q1 2027 so that the laboratory is designed by the people who will run it. UFV's own programs supply many of the laboratory and data roles, and the workforce deliverable (D6) adds a certificate pathway and a paid reserve roster for surge periods. A responsibility assignment matrix will name one accountable person for every work package.</p>
+
+  </section>
+
+<section id="motivation"><h2>19. Motivating the team</h2><p>Schwalbe summarizes motivation theories including Maslow's hierarchy, Herzberg's motivation-hygiene theory and McClelland's needs <a class="cite" href="#ref-schwalbe">(Schwalbe, 2019)</a>. Herzberg's distinction is the most useful here. Hygiene factors, such as fair pay, safe laboratories, reasonable hours and clear supervision, prevent dissatisfaction but do not motivate anyone. Motivators, such as achievement, recognition, responsibility and a visible purpose, do. The project provides both: market-based salaries and protected shifts, and a steady stream of recognition built into the work, such as sharing the weeks when the network caught something early, naming staff on the public dashboard, funding conference presentations and giving real responsibility to junior staff and students. Because much of the work is routine sampling and testing, rotating people between field, laboratory and analysis roles helps prevent boredom.</p>
+
+  </section>
+
+<section id="resources"><h2>20. Resource planning</h2><p>Resources include people, but also space, equipment, vehicles, software and money. The longest-lead item is the laboratory site, which needs space in a UFV facility (Abbotsford is the working assumption) with clean and dirty areas separated <a class="cite" href="#ref-aphl">(Association of Public Health Laboratories, 2026)</a>. Equipment is staged in two waves so that spending follows readiness. People are phased according to the Gantt chart: the project office first, then laboratory staff, then field technicians as each sampler wave is commissioned. A resource calendar, updated monthly, flags where two work packages compete for the same resources, most likely in Q3 and Q4 2028 when commissioning, the second sampler wave and platform sprints overlap.</p>
+</section>
+
+<section id="comms"><h2>21. Communicating to stakeholders</h2><p>The communications plan sets out who needs which message, how often and through which channel. Wastewater results are population-level data, and public messages make clear that no individual is identified.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Audience</th><th>Message</th><th>Channel</th><th>Frequency</th><th>Owner</th></tr></thead>
+    <tbody>
+      <tr><td>Funder, steering committee</td><td>Status, spend, risks, decisions</td><td>Quarterly gate review, written report</td><td>Quarterly (monthly summary)</td><td>Project manager</td></tr>
+      <tr><td>Fraser Health, BCCDC</td><td>Results, signals, alerts</td><td>Secure portal, direct phone line</td><td>Twice weekly; 24-hour alerts</td><td>Lab director</td></tr>
+      <tr><td>Municipalities and plant operators</td><td>Sampling schedules, site impacts</td><td>Operations meeting</td><td>Monthly</td><td>Field lead</td></tr>
+      <tr><td>First Nations partners</td><td>Plans, results, data governance</td><td>Government-to-government meetings, community sessions</td><td>As agreed with each Nation</td><td>Community liaison</td></tr>
+      <tr><td>Care homes, schools, farms</td><td>Facility results, what to do</td><td>Direct contact, briefing sheet</td><td>Per result</td><td>Liaison with Fraser Health</td></tr>
+      <tr><td>UFV community</td><td>Opportunities, progress</td><td>Intranet, town halls</td><td>Monthly</td><td>Communication lead</td></tr>
+      <tr><td>Public</td><td>Plain-language trends and actions</td><td>Dashboard, local media, multilingual notices</td><td>Weekly</td><td>Communication lead</td></tr>
+    </tbody></table></div>
+
+  </section>
+
+<section id="risks"><h2>22. The top ten risks</h2><p>Risks are rated on probability and impact from 1 (low) to 5 (high), and the score is the product of the two. All ratings are team judgement and would be updated monthly in the risk register. Items with a score of 15 or more are highlighted.</p>
+  <div class="scroll"><table class="matrix"><thead><tr><th>#</th><th>Risk</th><th>P</th><th>I</th><th>Score</th><th>Response</th><th>Owner</th></tr></thead><tbody>
+<tr class="s-hi"><td>R1</td><td>Operating funds after 2029 are not secured</td><td>4</td><td>5</td><td class="score">20</td><td>Sustainment fund of $60 million; draft operating agreement with Province and federal partners by Q2 2029</td><td>Sponsor</td></tr>
+<tr class="s-hi"><td>R2</td><td>Laboratory construction delays or cost overruns</td><td>4</td><td>4</td><td class="score">16</td><td>Fixed-price design-build, early site and flood review <a class="cite" href="#ref-fvc22">(Fraser Valley Current, 2022)</a>, milestone payments, contingency</td><td>Project manager</td></tr>
+<tr class="s-hi"><td>R3</td><td>Shortage of skilled laboratory and data staff</td><td>4</td><td>4</td><td class="score">16</td><td>UFV training pipeline, early hiring of director, retention bonuses <a class="cite" href="#ref-zeidler">(Zeidler, 2023)</a></td><td>HR lead</td></tr>
+<tr class="s-hi"><td>R4</td><td>Flood or climate disruption of plants and laboratory</td><td>3</td><td>5</td><td class="score">15</td><td>Flood-proof siting, offsite data backup, mobile samplers, continuity plan <a class="cite" href="#ref-fvc22">(Fraser Valley Current, 2022)</a></td><td>Operations lead</td></tr>
+<tr><td>R5</td><td>Delays in access and agreements with plant operators</td><td>3</td><td>4</td><td class="score">12</td><td>Memoranda signed in pre-initiation; shared governance; address capacity concerns <a class="cite" href="#ref-gnews23">(Global News, 2023)</a></td><td>Field lead</td></tr>
+<tr><td>R6</td><td>Privacy and community trust concerns, including Indigenous data governance</td><td>3</td><td>4</td><td class="score">12</td><td>Privacy impact assessment, population-level data only, data agreements with First Nations</td><td>Community liaison</td></tr>
+<tr><td>R7</td><td>Supply-chain delays for instruments and reagents</td><td>3</td><td>4</td><td class="score">12</td><td>Early orders, two suppliers, standing offers, spares</td><td>Procurement lead</td></tr>
+<tr><td>R8</td><td>Scope creep from partner requests</td><td>4</td><td>3</td><td class="score">12</td><td>Change control board, documented acceptance criteria</td><td>Project manager</td></tr>
+<tr><td>R9</td><td>Cyberattack or breach of the data platform</td><td>2</td><td>5</td><td class="score">10</td><td>Security architecture, penetration testing, access control, incident drills</td><td>Data lead</td></tr>
+<tr><td>R10</td><td>False alarms or misread signals reduce trust</td><td>3</td><td>3</td><td class="score">9</td><td>Thresholds validated with medical health officers, replicate testing, transparent methods</td><td>Lab director</td></tr>
+</tbody></table></div>
+  <h4>Controlling risks</h4>
+  <p>Each risk has an owner and a trigger. The project manager checks the register monthly, the steering committee checks the top five quarterly, and any risk that reaches an impact of 5 is escalated to the sponsor. Responses are to avoid, mitigate, transfer (through contract terms or insurance) or accept, with the contingency reserve applied to accepted and residual risks <a class="cite" href="#ref-pmi">(Project Management Institute, 2021)</a>.</p>
+</section>
+
+<section id="procurement"><h2>23. What UFV and the project must buy</h2><p>The make-or-buy decision favours buying equipment, construction and commercial software, while UFV and its partners do the sampling, analysis and community work in-house. Public procurement rules apply, so major purchases are competitively tendered. A procurement officer joins the team in Q1 2027.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Item</th><th>Budget line</th><th>Method</th><th>Contract type</th><th>Timing</th></tr></thead>
+    <tbody>
+      <tr><td>Laboratory building wing (design and construction)</td><td>Pathogen laboratory</td><td>Open tender, design-build</td><td>Fixed price with milestones</td><td>Award Q2 2027</td></tr>
+      <tr><td>PCR instruments, sequencers, freezers, biosafety cabinets and automation <a class="cite" href="#ref-aphl">(Association of Public Health Laboratories, 2026)</a></td><td>Pathogen laboratory</td><td>Competitive tender with service contracts</td><td>Fixed price plus maintenance</td><td>Orders Q4 2027 and Q1 2028</td></tr>
+      <tr><td>Automated composite samplers, flow meters, installation</td><td>Sampling network</td><td>Competitive tender, standing offer</td><td>Fixed unit price</td><td>Waves in Q3 2027 and Q1 2028</td></tr>
+      <tr><td>Mobile sampling vehicles and cold-chain transport</td><td>Sampling network, surge hub</td><td>Competitive quote</td><td>Fixed price</td><td>2027 to 2028</td></tr>
+      <tr><td>Data platform development, cloud hosting, security testing</td><td>Data platform</td><td>Request for proposals</td><td>Time and materials with a cap</td><td>Q2 2027 start</td></tr>
+      <tr><td>Reagents and consumables</td><td>Operations</td><td>Standing offers with two suppliers</td><td>Unit price, annual</td><td>From 2028</td></tr>
+      <tr><td>Surge supplies (PPE, test kits, cold storage)</td><td>Surge hub</td><td>Standing offers with rotation of stock</td><td>Unit price with expiry management</td><td>2028</td></tr>
+      <tr><td>Independent audit and evaluation</td><td>Governance</td><td>Request for proposals</td><td>Fixed price</td><td>Annually from 2027</td></tr>
+    </tbody></table></div>
+  <p>Contracts include performance provisions, delay damages for construction and delivery dates, and the right to terminate for cause. Every vendor is assessed on price, technical fit, local service ability and, where relevant, the ability to supply replacement parts quickly. The last phase is contract closure: each contract is checked, accepted, paid and archived.</p>
+</section>
+
+<section id="handling"><h2>24. Handling stakeholders</h2><p>High-influence, high-interest groups (the funder, BCCDC, Fraser Health, UFV leadership and First Nations) are managed closely, with a seat on the steering committee. High-interest groups with lower influence, such as care home operators, poultry producers and residents, are kept informed and given a formal route to raise concerns. Medium groups, such as vendors, are monitored. Four tactics apply throughout: engage early, ask each group what success means to them, never let a partner learn bad news from the media, and record commitments in the stakeholder register. The poultry sector needs special care because early detection must not feel like punishment; the agreement with producers states that signals are used for protection and support <a class="cite" href="#ref-graber">(Graber, 2024)</a>.</p>
+</section>
+
+<section id="closing"><h2>25. Closing process</h2>
+  <p>Closing starts in Q3 2029, not in December, because the fixed end date of December 31, 2029 leaves no room for a late start. It has four tracks.</p>
+  <ul>
+    <li><strong>Administrative closure.</strong> Verify that all deliverables are accepted as required, get sign-off from the sponsor and both champions, and keep records.</li>
+    <li><strong>Contract closure.</strong> Check deliveries, settle claims, complete final accounts and release holdbacks on all contracts.</li>
+    <li><strong>Handover.</strong> Transfer the laboratory, platform and hub to the long-term operator under the operating agreement, supported by the $60 million sustainment fund, and move staff to permanent roles or release them with references and notice.</li>
+    <li><strong>Learning and accountability.</strong> Hold a review with partners, complete an independent audit, return any remaining contingency to the funder, and release a final report and a public summary.</li>
+  </ul>
+  <p>The project is closed when the sponsor signs the final acceptance. A post-implementation review is planned for twelve months later to check whether the benefits, such as signal lead time and alert speed, are being achieved.</p>
+</section>
+
+<section id="references">
+  <h2>References</h2>
+  <p>Formatted in APA 7th edition style. Publication details for web sources were taken from the pages themselves, and each should be checked against the live page and your course reading list before submission.</p>
+  <ul class="refs">
+<li id="ref-aphl">Association of Public Health Laboratories. (2026, June). <i>Public health laboratory guide to microbial wastewater surveillance</i>. <a href='https://aphl.org/resources/resource-detail/wastewater-surveillance-guide'>https://aphl.org/resources/resource-detail/wastewater-surveillance-guide</a></li>
+<li id="ref-oag">Auditor General of Canada. (2021). <i>Report 8—Pandemic preparedness, surveillance, and border control measures</i>. Reports of the Auditor General of Canada to the Parliament of Canada. <a href='https://www.canada.ca/en/auditor-general/our-work/audit-reports/parl-oag-202103-03-e.html'>https://www.canada.ca/en/auditor-general/our-work/audit-reports/parl-oag-202103-03-e.html</a></li>
+<li id="ref-bccdc">BC Centre for Disease Control. (n.d.). <i>Wastewater surveillance</i>. <a href='https://www.bccdc.ca/our-services/programs/wastewater-surveillance'>https://www.bccdc.ca/our-services/programs/wastewater-surveillance</a></li>
+<li id="ref-bolman">Bolman, L. G., &amp; Deal, T. E. (2017). <i>Reframing organizations: Artistry, choice, and leadership</i> (6th ed.). Jossey-Bass.</li>
+<li id="ref-cwn">Canadian Water Network. (2024, May). <i>Wastewater-based surveillance for public health: BC case example</i> (A Knowledge to Action series). National Collaborating Centre for Infectious Diseases. <a href='https://nccid.ca/wp-content/uploads/sites/2/2024/06/BC_CaseExample_CWN_WBS-for-public-health_-EN_May2024.pdf'>https://nccid.ca/wp-content/uploads/sites/2/2024/06/BC_CaseExample_CWN_WBS-for-public-health_-EN_May2024.pdf</a></li>
+<li id="ref-cbc240">CBC News. (2020). <i>Ottawa has spent $240B fighting COVID-19 in just 8 months. A CBC investigation follows the money</i>. <a href='https://amp.cbc.ca/lite/story/1.5827045'>https://amp.cbc.ca/lite/story/1.5827045</a></li>
+<li id="ref-cbcag">CBC News. (2021, March 25). <i>Public Health Agency was unprepared for the pandemic and 'underestimated' the danger, auditor general says</i>. <a href='https://www.cbc.ca/news/politics/auditor-general-pandemic-covid-phac-1.5963895'>https://www.cbc.ca/news/politics/auditor-general-pandemic-covid-phac-1.5963895</a></li>
+<li id="ref-cbc22">CBC News. (2022). <i>Fraser Valley farmers facing 'intense' pressure over avian flu outbreak, minister says</i>. <a href='https://amp.cbc.ca/news/canada/british-columbia/b-c-says-doing-all-it-can-to-stop-avian-flu-1.6660798'>https://amp.cbc.ca/news/canada/british-columbia/b-c-says-doing-all-it-can-to-stop-avian-flu-1.6660798</a></li>
+<li id="ref-cbcradio">CBC Radio. (2024, November 14). <i>B.C. farmer devastated to cull 30,000 hens after bird flu outbreak</i>. CBC News. <a href='https://www.cbc.ca/lite/story/1.7383416'>https://www.cbc.ca/lite/story/1.7383416</a></li>
+<li id="ref-abby">City of Abbotsford. (n.d.). <i>JAMES wastewater treatment plant</i>. <a href='https://www.abbotsford.ca/city-hall/projects-go/james-wastewater-treatment-plant'>https://www.abbotsford.ca/city-hall/projects-go/james-wastewater-treatment-plant</a></li>
+<li id="ref-chwk">City of Chilliwack. (n.d.). <i>Wastewater treatment plant</i>. <a href='https://chilliwack.com/main/page.cfm?id=3101'>https://chilliwack.com/main/page.cfm?id=3101</a></li>
+<li id="ref-citynews">CityNews 1130. (2021, March 2). <i>Canada's GDP down 5.4 per cent in 2020, worst year on record</i>. <a href='https://www.citynews1130.com/2021/03/02/canada-gdp-down-5-4-per-cent-2020/'>https://www.citynews1130.com/2021/03/02/canada-gdp-down-5-4-per-cent-2020/</a></li>
+<li id="ref-queens">Cotton, C., Crowley, B., Kashi, B., Lloyd-Ellis, H., &amp; Tremblay, F. (2020). <i>Quantifying the economic impacts of COVID-19 policy responses on Canada's provinces in (almost) real time</i> (Working Paper No. 1441). Queen's University, Department of Economics. <a href='https://www.econ.queensu.ca/sites/econ.queensu.ca/files/wpaper/qed_wp_1441.pdf'>https://www.econ.queensu.ca/sites/econ.queensu.ca/files/wpaper/qed_wp_1441.pdf</a></li>
+<li id="ref-ctv22">CTV News. (2022). <i>Avian flu confirmed in Abbotsford, B.C., poultry flock</i>. <a href='https://bc.ctvnews.ca/mobile/avian-flu-confirmed-in-abbotsford-b-c-poultry-flock-1.5912165'>https://bc.ctvnews.ca/mobile/avian-flu-confirmed-in-abbotsford-b-c-poultry-flock-1.5912165</a></li>
+<li id="ref-fhhpai">Fraser Health. (n.d.). <i>Highly pathogenic avian influenza</i>. <a href='https://www.fraserhealth.ca/employees/medical-health-officer-updates/highly-pathogenic-avian-influenza'>https://www.fraserhealth.ca/employees/medical-health-officer-updates/highly-pathogenic-avian-influenza</a></li>
+<li id="ref-fh2021">Fraser Health. (2021, October). <i>Fraser Health declares COVID-19 outbreaks at Chilliwack General Hospital, Harrison Pointe</i> [Information bulletin]. <a href='https://www.fraserhealth.ca/news/2021/Oct/fraser-health-declares-covid-19-outbreaks-at-chilliwack-general-hospital-harrison-pointe'>https://www.fraserhealth.ca/news/2021/Oct/fraser-health-declares-covid-19-outbreaks-at-chilliwack-general-hospital-harrison-pointe</a></li>
+<li id="ref-fh2022">Fraser Health. (2022, January). <i>Fraser Health declares COVID-19 outbreaks over at Eagle Ridge Hospital, The Oxford Senior Care Home</i> [Information bulletin]. <a href='https://fraserhealth.ca/news/2022/Jan/fraser-health-declares-covid-19-outbreaks-over-at-eagle-ridge-hospital-the-oxford-senior-care-home'>https://fraserhealth.ca/news/2022/Jan/fraser-health-declares-covid-19-outbreaks-over-at-eagle-ridge-hospital-the-oxford-senior-care-home</a></li>
+<li id="ref-fvc22">Fraser Valley Current. (2022). <i>Backups &amp; bypasses: What happens if a flood hits a Fraser Valley sewage plant?</i> <a href='https://fvcurrent.com/p/wastewater-flooding-2022'>https://fvcurrent.com/p/wastewater-flooding-2022</a></li>
+<li id="ref-fvrdind">Fraser Valley Regional District. (n.d.). <i>Population statistics</i>. <a href='https://haveyoursay.fvrd.ca/indigenous-relations/news_feed/population-statistics'>https://haveyoursay.fvrd.ca/indigenous-relations/news_feed/population-statistics</a></li>
+<li id="ref-fvrd22">Fraser Valley Regional District. (2022). <i>2021 annual report</i>. <a href='https://fvrd.ca/assets/Government/Documents/Financial~Reporting/FVRD%202021%20Annual%20Report%20-%20lo%20res.pdf'>https://fvrd.ca/assets/Government/Documents/Financial~Reporting/FVRD%202021%20Annual%20Report%20-%20lo%20res.pdf</a></li>
+<li id="ref-fvrd25">Fraser Valley Regional District. (2025). <i>Regional growth strategy monitoring report 2025</i>. <a href='https://www.fvrd.ca/assets/About~the~FVRD/Documents/RGS/RGS%20Monitoring%20Report%202025_reduced.pdf'>https://www.fvrd.ca/assets/About~the~FVRD/Documents/RGS/RGS%20Monitoring%20Report%202025_reduced.pdf</a></li>
+<li id="ref-straight">Georgia Straight. (2020, December 18). <i>COVID-19 in B.C.: 36 schools with new exposures, lower case counts, and more</i>. <a href='https://www.straight.com/covid-19-pandemic/december-18-coronavirus-update-bc-vancouver-36-schools-with-new-exposures-lower-case-counts-and-more'>https://www.straight.com/covid-19-pandemic/december-18-coronavirus-update-bc-vancouver-36-schools-with-new-exposures-lower-case-counts-and-more</a></li>
+<li id="ref-globalch">Global News. (2021). <i>COVID-19 outbreak declared at Chilliwack General Hospital</i>. <a href='https://globalnews.ca/news/7721901/covid-19-outbreak-declared-at-chilliwack-general-hospital/amp'>https://globalnews.ca/news/7721901/covid-19-outbreak-declared-at-chilliwack-general-hospital/amp</a></li>
+<li id="ref-gnews23">Global News. (2023). <i>Fraser Valley septic waste disposal plants worry</i>. <a href='https://globalnews.ca/news/10049451/fraser-valley-septic-waste-disposal-plants-worry'>https://globalnews.ca/news/10049451/fraser-valley-septic-waste-disposal-plants-worry</a></li>
+<li id="ref-graber">Graber, R. (2024). <i>100 flocks have been hit by avian flu in Abbotsford, BC</i>. WATTPoultry. <a href='https://wattagnet.com/poultry-meat/diseases-health/avian-influenza/news/15709656/100-flocks-have-been-hit-by-avian-flu-in-abbotsford-bc'>https://wattagnet.com/poultry-meat/diseases-health/avian-influenza/news/15709656/100-flocks-have-been-hit-by-avian-flu-in-abbotsford-bc</a></li>
+<li id="ref-hach">Hach. (n.d.). <i>What you need to know about in-house wastewater based epidemiology</i>. <a href='https://waterinsights.hach.com/?p=684'>https://waterinsights.hach.com/?p=684</a></li>
+<li id="ref-kulkarni">Kulkarni, A. (2025). <i>Under the microscope: Looking at B.C.'s wastewater surveillance for viruses</i>. CBC News. <a href='https://www.cbc.ca/1.7485107'>https://www.cbc.ca/1.7485107</a></li>
+<li id="ref-mathematica">Mathematica. (n.d.). <i>The costs of wastewater monitoring in low- and middle-income countries</i>. <a href='https://mathematica.org/publications/the-costs-of-wastewater-monitoring-in-low-and-middle-income-countries'>https://mathematica.org/publications/the-costs-of-wastewater-monitoring-in-low-and-middle-income-countries</a></li>
+<li id="ref-overton">Overton, A. K., Knapp, J. J., Lawal, O. U., &amp; colleagues. (2024). <i>Genomic surveillance of a Canadian airport wastewater samples allows early detection of emerging SARS-CoV-2 lineages</i> [Preprint]. Research Square. <a href='https://www.researchsquare.com/article/rs-4183960/latest'>https://www.researchsquare.com/article/rs-4183960/latest</a></li>
+<li id="ref-path">PATH. (n.d.). <i>How sewage can help countries get ahead of COVID-19 variants</i>. <a href='https://www.path.org/our-impact/articles/how-sewage-can-help-countries-get-ahead-covid-19-variants/'>https://www.path.org/our-impact/articles/how-sewage-can-help-countries-get-ahead-covid-19-variants/</a></li>
+<li id="ref-pmi">Project Management Institute. (2021). <i>A guide to the project management body of knowledge (PMBOK® guide)</i> (7th ed.). Project Management Institute.</li>
+<li id="ref-phac23">Public Health Agency of Canada. (2023). Wastewater surveillance for earlier detection of seniors congregate living COVID-19 outbreaks in Peterborough, Ontario. <i>Canada Communicable Disease Report, 49</i>(2/3), 35–43. <a href='https://doi.org/10.14745/ccdr.v49i23a02'>https://doi.org/10.14745/ccdr.v49i23a02</a></li>
+<li id="ref-phac26">Public Health Agency of Canada. (2026). Economic evaluation of wastewater surveillance in Ontario, Canada, using COVID-19 as a case study. <i>Canada Communicable Disease Report, 52</i>(6). <a href='https://doi.org/10.14745/ccdr.v52i06a04'>https://doi.org/10.14745/ccdr.v52i06a04</a></li>
+<li id="ref-sanjak">Sanjak, J. S., McAuley, E. M., Raybern, J., Pinkham, R., Tarnowski, J., &amp; colleagues. (2024). Wastewater surveillance pilot at US military installations: Cost model analysis. <i>JMIR Public Health and Surveillance, 10</i>, Article e54750. <a href='https://doi.org/10.2196/54750'>https://doi.org/10.2196/54750</a></li>
+<li id="ref-schwalbe">Schwalbe, K. (2019). <i>Information technology project management</i> (9th ed.). Cengage Learning.</li>
+<li id="ref-statcan20">Statistics Canada. (2020). <i>Recent developments in the Canadian economy, 2020: COVID-19, third edition</i> (Catalogue no. 11-626-X). <a href='https://www150.statcan.gc.ca/n1/pub/11-626-x/11-626-x2020013-eng.htm'>https://www150.statcan.gc.ca/n1/pub/11-626-x/11-626-x2020013-eng.htm</a></li>
+<li id="ref-statcan21">Statistics Canada. (2021). <i>Economic impacts of COVID-19 in the provinces and territories</i> (Catalogue no. 11-631-X). <a href='https://www150.statcan.gc.ca/n1/pub/11-631-x/11-631-x2021002-eng.htm'>https://www150.statcan.gc.ca/n1/pub/11-631-x/11-631-x2021002-eng.htm</a></li>
+<li id="ref-ufvcamp">University of the Fraser Valley. (n.d.-a). <i>Campuses and locations</i>. <a href='https://www.ufv.ca/about/campuses/'>https://www.ufv.ca/about/campuses/</a></li>
+<li id="ref-ufvabout">University of the Fraser Valley. (n.d.-b). <i>About UFV</i>. <a href='https://ufv.ca/about'>https://ufv.ca/about</a></li>
+<li id="ref-ufvsem">University of the Fraser Valley. (2022). <i>Access to excellence: Managing enrolment at the University of the Fraser Valley, 2023–2030</i> [Strategic enrolment management plan summary]. <a href='https://ufv.ca/media/assets/provost/education-plans/UFV2022_SEMPlanReport-FINAL.pdf'>https://ufv.ca/media/assets/provost/education-plans/UFV2022_SEMPlanReport-FINAL.pdf</a></li>
+<li id="ref-xie">Xie, Y., Challis, J. K., Oloye, F. F., Asadi, M., Cantin, J., Brinkmann, M., &amp; colleagues. (2022). <i>RNA in municipal wastewater reveals magnitudes of COVID-19 outbreaks across four waves driven by SARS-CoV-2 variants of concern</i>. <a href='https://researchers.usask.ca/john-giesy/documents/ja-1188.pdf'>https://researchers.usask.ca/john-giesy/documents/ja-1188.pdf</a></li>
+<li id="ref-zeidler">Zeidler, M. (2023). <i>B.C. expands COVID-19 wastewater monitoring to Prince George</i>. CBC News. <a href='https://www.cbc.ca/1.6993062'>https://www.cbc.ca/1.6993062</a></li>
+  </ul>
+</section>
+</main>
+
+<div class="wrap"><footer>Fraser Valley Early Warning Network. Course proposal for Chaacha &amp; UFV. The $1 billion investment and December 31, 2029 go-live date are part of the course scenario.</footer></div>
+
+</body></html>
